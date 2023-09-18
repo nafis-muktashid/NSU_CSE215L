@@ -22,6 +22,7 @@ public class UI extends JFrame{
 		courses.setBounds(5, 30, 50, 20);
 		frame.add(courses);
 		
+//Drop-down box
 		String courses1[]= {"CSE115", "CSE215", "CSE173"};
 		JComboBox<String> cb = new JComboBox<String>(courses1);
 		cb.setBounds(65, 30, 100, 20);
