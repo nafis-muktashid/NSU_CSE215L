@@ -1,6 +1,6 @@
-package rds_cpy;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class UI extends JFrame{
 	public static void main(String[] args) {
@@ -9,45 +9,46 @@ public class UI extends JFrame{
 		frame.setLocationRelativeTo(null);
 		
 		JTextField txtFld = new JTextField();
-		txtFld.setBounds(65, 5, 100, 20);
+		txtFld.setBounds(65, 5, 365, 20);
 		frame.add(txtFld);
 		
 		JLabel id = new JLabel("ID");
 		id.setBounds(5, 5, 50, 20);
 		frame.add(id);
 		
-		
-		
 		JLabel courses = new JLabel("Courses");
-		courses.setBounds(5, 30, 50, 20);
+		courses.setBounds(5, 45, 50, 20);
 		frame.add(courses);
 		
 //Drop-down box
-		String courses1[]= {"CSE115", "CSE215", "CSE173"};
+		String courses1[]= {"1. CSE115 Introduction to C... 3.0", "2. CSE173 Discrete Mathematics 3.0", "3. CSE215 Introduction to Java... 3.0"};
 		JComboBox<String> cb = new JComboBox<String>(courses1);
-		cb.setBounds(65, 30, 100, 20);
+		cb.setBounds(65, 45, 280, 20);
 		frame.add(cb);
 		
 		JButton add = new JButton("ADD");
 		add.setFocusable(false);
-		add.setBounds(175, 30, 75, 20);
+		add.setBounds(355, 45, 75, 20);
 		frame.add(add);
 		
-		
-		
-		JTextArea table = new JTextArea();
-		table.setBounds(5, 70, 245, 200);
+		//Table for selected Course
+		DefaultTableModel slctTable = new DefaultTableModel(new Object[][] {}, new String[] {"Selected Courses"});
+		JTable table = new JTable(slctTable);
+		table.setBounds(5, 100, 425, 400);
 		table.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		frame.add(table);
 		
-		
 		JButton save = new JButton("SAVE");
 		save.setFocusable(false);
-		save.setBounds(90, 275, 75, 20);
+		save.setBounds(185, 505, 75, 20);
 		frame.add(save);
+		
+		ButtonWorks btadd = new ButtonWorks(cb, slctTable);
+		add.addActionListener(btadd);
 		
 		
 		frame.setLayout(null);
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		frame.setVisible(true);
 	}
