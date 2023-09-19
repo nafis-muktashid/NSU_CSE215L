@@ -1,6 +1,8 @@
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 public class UI extends JFrame{
 	public static void main(String[] args) {
@@ -20,7 +22,7 @@ public class UI extends JFrame{
 		courses.setBounds(5, 45, 50, 20);
 		frame.add(courses);
 		
-//Drop-down box
+		//Drop-down box
 		String courses1[]= {"1. CSE115 Introduction to C... 3.0", "2. CSE173 Discrete Mathematics 3.0", "3. CSE215 Introduction to Java... 3.0"};
 		JComboBox<String> cb = new JComboBox<String>(courses1);
 		cb.setBounds(65, 45, 280, 20);
@@ -32,9 +34,12 @@ public class UI extends JFrame{
 		frame.add(add);
 		
 		//Table for selected Course
-		DefaultTableModel slctTable = new DefaultTableModel(new Object[][] {}, new String[] {"Selected Courses"});
+		DefaultTableModel slctTable = new DefaultTableModel(new Object[][] {}, new String[] {"SL","Courses", "Name", "Credit"});
+		slctTable.addRow(new Object[] {"SL", "Course", "Name", "Credit"});
 		JTable table = new JTable(slctTable);
 		table.setBounds(5, 100, 425, 400);
+		table.getColumnModel().getColumn(0).setPreferredWidth(1);
+		table.getColumnModel().getColumn(2).setPreferredWidth(200);
 		table.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		frame.add(table);
 		
@@ -48,7 +53,7 @@ public class UI extends JFrame{
 		
 		
 		frame.setLayout(null);
-		frame.setResizable(false);
+		frame.setResizable(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 		frame.setVisible(true);
 	}
