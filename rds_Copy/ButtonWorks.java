@@ -17,7 +17,9 @@ public class ButtonWorks implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		Mp map = new Mp();
 		String selectedCourse = cBox.getSelectedItem().toString();
-		tbl.addRow(new Object[] {selectedCourse});
+		Course cor = map.getKey(selectedCourse);
+		tbl.addRow(new Object[]{1+"",cor.cID,cor.cName,cor.cRedit});
 	}
 }
