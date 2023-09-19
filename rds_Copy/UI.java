@@ -42,7 +42,7 @@ public class UI extends JFrame{
 		JTable table = new JTable(slctTable);
 		table.setBounds(5, 100, 425, 400);
 		table.getColumnModel().getColumn(0).setPreferredWidth(1);
-		table.getColumnModel().getColumn(2).setPreferredWidth(20);
+		table.getColumnModel().getColumn(2).setPreferredWidth(200);
 		table.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		frame.add(table);
 		
@@ -51,14 +51,8 @@ public class UI extends JFrame{
 		save.setBounds(185, 505, 75, 20);
 		frame.add(save);
 		
-		int i=1;
-		add.addActionListener((ae)->{
-            Course cor = (Course) cb.getSelectedItem();
-            slctTable.addRow(new Object[]{i+"",cor.id,cor.title,cor.credit});
-            i++;
-            cor.setDisable(true);
-            cb.repaint();
-        });
+		ButtonWorks btw = new ButtonWorks(cb, slctTable);
+		add.addActionListener(btw);
 
 		
 		
