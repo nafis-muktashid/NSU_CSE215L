@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -6,6 +8,7 @@ import javax.swing.table.TableColumnModel;
 
 public class UI extends JFrame{
 	public static void main(String[] args) {
+		
 		JFrame frame = new JFrame("RDS");
 		frame.setSize(450, 600);
 		frame.setLocationRelativeTo(null);
@@ -23,7 +26,7 @@ public class UI extends JFrame{
 		frame.add(courses);
 		
 		//Drop-down box
-		String courses1[]= {"1. CSE115 Introduction to C... 3.0", "2. CSE173 Discrete Mathematics 3.0", "3. CSE215 Introduction to Java... 3.0"};
+		String courses1[]= {"CSE115", "CSE173", "CSE215"};
 		JComboBox<String> cb = new JComboBox<String>(courses1);
 		cb.setBounds(65, 45, 280, 20);
 		frame.add(cb);
@@ -39,7 +42,7 @@ public class UI extends JFrame{
 		JTable table = new JTable(slctTable);
 		table.setBounds(5, 100, 425, 400);
 		table.getColumnModel().getColumn(0).setPreferredWidth(1);
-		table.getColumnModel().getColumn(2).setPreferredWidth(200);
+		table.getColumnModel().getColumn(2).setPreferredWidth(20);
 		table.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		frame.add(table);
 		
@@ -48,8 +51,16 @@ public class UI extends JFrame{
 		save.setBounds(185, 505, 75, 20);
 		frame.add(save);
 		
-		ButtonWorks btadd = new ButtonWorks(cb, slctTable);
-		add.addActionListener(btadd);
+		int i=1;
+		add.addActionListener((ae)->{
+            Course cor = (Course) cb.getSelectedItem();
+            slctTable.addRow(new Object[]{i+"",cor.id,cor.title,cor.credit});
+            i++;
+            cor.setDisable(true);
+            cb.repaint();
+        });
+
+		
 		
 		
 		frame.setLayout(null);
