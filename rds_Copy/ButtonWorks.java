@@ -9,6 +9,7 @@ import javax.swing.table.DefaultTableModel;
 public class ButtonWorks implements ActionListener{
 	private JComboBox<String> cBox;
 	private DefaultTableModel tbl;
+	int i=0;
 	
 	public ButtonWorks(JComboBox<String> c, DefaultTableModel t) {
 		this.tbl = t;
@@ -20,6 +21,6 @@ public class ButtonWorks implements ActionListener{
 		Mp map = new Mp();
 		String selectedCourse = cBox.getSelectedItem().toString();
 		Course cor = map.getKey(selectedCourse);
-		tbl.addRow(new Object[]{1+"",cor.cID,cor.cName,cor.cRedit});
+		tbl.addRow(new Object[]{++i +"",cor.cID,cor.cName,cor.cRedit});
 	}
 }
