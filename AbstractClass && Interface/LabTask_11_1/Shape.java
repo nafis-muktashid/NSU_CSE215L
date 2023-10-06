@@ -1,5 +1,3 @@
-package LabTask_11_1;
-
 
 public abstract class Shape {
 	String name;
