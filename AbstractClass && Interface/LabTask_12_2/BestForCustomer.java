@@ -1,4 +1,5 @@
 package LabTask_12_2;
+package pack1;
 
 public class BestForCustomer implements Discountable{
 	private double percentage;
@@ -37,12 +38,20 @@ public class BestForCustomer implements Discountable{
 
 	@Override
 	public double discountedPrice(double price) {
-		double p1 = price-price*(this.percentage/100);
-		double p2 = 0;
+		PercentageDiscount p11 = new PercentageDiscount(this.percentage);
+		ThresholdDiscount p12 = new ThresholdDiscount(this.threshold, this.discount);
+		double p1 = p11.discountedPrice(price);
+		double p2 = p12.discountedPrice(price);
 		if(price>this.threshold) p2 = price - this.discount;
 		
-		if(p1>p2) return p1;
-		else return p2;
+		if(p1<p2) {
+			System.out.print("From Percentage Discount ");
+			return p1;
+		}
+		else {
+			System.out.print("From Threshold Discount ");
+			return p2;
+		}
 	}
 	
 	
