@@ -29,7 +29,7 @@ public class ThresholdDiscount implements Discountable{
 
 	@Override
 	public double discountedPrice(double price) {
-		if(price<this.threshold) return 0;
+		if(price<this.threshold) return price;
 		else return price - this.discount;
 	}
 	
