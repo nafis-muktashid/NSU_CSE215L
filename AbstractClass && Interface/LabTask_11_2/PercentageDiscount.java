@@ -1,5 +1,4 @@
 package LabTask_11_2;
-
 public class PercentageDiscount implements Discountable {
 	private double percentage;
 	
@@ -23,6 +22,4 @@ public class PercentageDiscount implements Discountable {
 	public double discountedPrice(double price) {
 		return price-price*(this.percentage/100);
 	}
-	
-
 }
