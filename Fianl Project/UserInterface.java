@@ -9,9 +9,10 @@ import java.util.*;
 
 
 public class UserInterface extends JFrame {
-    ArrayList<Company> categorizedCompany;
+
+    ArrayList<Company> categorizedCompany, arrayListFromFile;
     static final String DATA_FILE = "data.txt";
-    JButton signIn, addCompInfo, showCompInfo, saveToFile, deleteCompInfo;
+    JButton signIn, addCompInfo, showCompInfo, saveToFile, deleteCompInfo, editCompInfo, back;
     JTextField username;
     JPanel introMain, introLogIn, afterSignIn;
     JComboBox<Company> infoFields;
@@ -22,6 +23,7 @@ public class UserInterface extends JFrame {
 
     UserInterface(){
         categorizedCompany = new ArrayList<>();
+        arrayListFromFile = new ArrayList<>();
         initializeUI();
         loadDataFromFile();
     }
@@ -95,6 +97,22 @@ public class UserInterface extends JFrame {
         deleteCompInfo.setBackground(Color.WHITE);
         deleteCompInfo.setFocusable(false);
 
+                    // Edit-Button
+        editCompInfo = new JButton();
+        editCompInfo.setText("EDIT INFO");
+        editCompInfo.setSize(120, 35);
+        editCompInfo.setFont(new Font("Arial", Font.BOLD, 13));
+        editCompInfo.setBackground(Color.WHITE);
+        editCompInfo.setFocusable(false);
+
+                    // Back-Button
+        back = new JButton();
+        back.setText("BACK");
+        back.setSize(120,35);
+        back.setFont(new Font("Arial", Font.BOLD, 13));
+        back.setBackground((Color.WHITE));
+        back.setFocusable(false);
+        back.setVisible(false);
 
 
 
@@ -125,17 +143,20 @@ public class UserInterface extends JFrame {
         introLogIn.setLayout(null);
         introLogIn.setBounds(492,0,492,561);
         introLogIn.add(signIn); // signInButton
-        signIn.setLocation(195, 290);
-        signIn.addActionListener(e -> {
-            String s = username.getText();
-            if(Objects.equals(s, "CE0")){
+            signIn.setLocation(195, 290);
+            signIn.addActionListener(e -> {
+                /*String s = username.getText();
+                if(Objects.equals(s, "CE0")){
+                    introMain.setVisible(false);
+                    introLogIn.setVisible(false);
+                    afterSignIn.setVisible(true);
+                }*/
                 introMain.setVisible(false);
                 introLogIn.setVisible(false);
                 afterSignIn.setVisible(true);
-            }
-        });
-        introLogIn.add(username);
-        username.setLocation(75, 250);
+            });
+            introLogIn.add(username);
+            username.setLocation(75, 250);
         this.add(introLogIn);
 
 
@@ -147,94 +168,115 @@ public class UserInterface extends JFrame {
         afterSignIn.setBackground(new Color(0x123456));
 
 
-        //Show Button
-        afterSignIn.add(showCompInfo);
-        showCompInfo.setLocation(430,310);
-        showCompInfo.addActionListener(e -> createAndShowTable());
+            //Add Button
+            afterSignIn.add(addCompInfo);
+            addCompInfo.setLocation(430,180);
+            addCompInfo.addActionListener(e -> {
+
+                String industry = JOptionPane.showInputDialog("Enter Industry");
+                int company_id = Integer.parseInt(JOptionPane.showInputDialog("Enter Company ID"));
+                String company_name = JOptionPane.showInputDialog("Enter Company Name");
+                String designation = JOptionPane.showInputDialog("Enter Designation");
+                int employeeCount = Integer.parseInt(JOptionPane.showInputDialog("Enter How Many Employee"));
+                double income = Double.parseDouble(JOptionPane.showInputDialog("Enter Income"));
+                income *= employeeCount;
+
+                Company newObj = new Company(industry, company_id, company_name,designation,employeeCount,income);
+
+                categorizedCompany.add(newObj);
+            });
 
 
-        //Add Button
-        afterSignIn.add(addCompInfo);
-        addCompInfo.setLocation(430,180);
-        addCompInfo.addActionListener(e -> {
-            loadDataFromFile();
-            String industry = JOptionPane.showInputDialog("Enter Industry");
-            int company_id = Integer.parseInt(JOptionPane.showInputDialog("Enter Company ID"));
-            String company_name = JOptionPane.showInputDialog("Enter Company Name");
-            String designation = JOptionPane.showInputDialog("Enter Designation");
-            int employeeCount = Integer.parseInt(JOptionPane.showInputDialog("Enter How Many Employee"));
-            double income = Double.parseDouble(JOptionPane.showInputDialog("Enter Income"));
-            income *= employeeCount;
 
-            Company newObj = new Company(industry, company_id, company_name,designation,employeeCount,income);
-
-            categorizedCompany.add(newObj);
-            saveDataToFile();
-        });
+            //Save Button
+            afterSignIn.add(saveToFile);
+            saveToFile.setLocation(430, 220);
+            saveToFile.addActionListener(e -> saveDataToFile());
 
 
-        //Save Button
-        afterSignIn.add(saveToFile);
-        saveToFile.setLocation(430, 220);
-        saveToFile.addActionListener(e -> saveDataToFile());
+
+            //Show Button
+            afterSignIn.add(showCompInfo);
+            showCompInfo.setLocation(430,310);
+            showCompInfo.addActionListener(e -> {
+                loadDataFromFile();
+                createAndShowTable();
+            });
 
 
-        //Delete Button
-        afterSignIn.add(deleteCompInfo);
-        deleteCompInfo.setLocation(430, 265);
-        tableCopy = new JTable();
-        tableScrollPaneCopy = new JScrollPane(tableCopy);
-        tableScrollPaneCopy.setPreferredSize(new Dimension(984, 561));
-        tableScrollPaneCopy.setBounds(0, 0, 984, 561);
-        tableCopy.setVisible(false);
-        tableScrollPaneCopy.setVisible(false);
-        afterSignIn.add(tableScrollPaneCopy);
-        deleteCompInfo.addActionListener(e -> {
-            showCompInfo.setVisible(false);
-            addCompInfo.setVisible(false);
-            saveToFile.setVisible(false);
-            deleteCompInfo.setVisible(false);
 
-            tableCopy.setVisible(true);
-            tableScrollPaneCopy.setVisible(true);
+            //Delete Button
+            afterSignIn.add(deleteCompInfo);
+            deleteCompInfo.setLocation(430, 265);
+            tableCopy = new JTable();
+            tableScrollPaneCopy = new JScrollPane(tableCopy);
+            tableScrollPaneCopy.setPreferredSize(new Dimension(984, 500));
+            tableScrollPaneCopy.setBounds(0, 0, 984, 500);
+            tableCopy.setVisible(false);
+            tableScrollPaneCopy.setVisible(false);
+            afterSignIn.add(tableScrollPaneCopy);
+            deleteCompInfo.addActionListener(e -> {
 
-            loadDataFromFile();
-            DefaultTableModel modelCopy = new DefaultTableModel();
-            modelCopy.addColumn("Industry");
-            modelCopy.addColumn("Company ID");
-            modelCopy.addColumn("Company Name");
-            modelCopy.addColumn("Designation");
-            modelCopy.addColumn("Employee Count");
-            modelCopy.addColumn("Income");
+                saveToFile.setLocation(490,515);
+                showCompInfo.setVisible(false);
+                addCompInfo.setVisible(false);
+                deleteCompInfo.setVisible(false);
 
-            for (Company obj : categorizedCompany) {
-                modelCopy.addRow(new String[]{obj.getIndustry(), String.valueOf(obj.getCompanyIds()), obj.getCompanyNames(),
-                        obj.getDesignations(), String.valueOf(obj.getHowManyEmployee()), String.valueOf(obj.getIncome())});
-            }
+                afterSignIn.add(back);
+                back.setVisible(true);
+                back.setLocation(350,515);
+                back.addActionListener(ex -> {
+                    tableCopy.setVisible(false);
+                    tableScrollPaneCopy.setVisible(false);
+                    back.setVisible(false);
+                    showCompInfo.setVisible(true);
+                    addCompInfo.setVisible(true);
+                    saveToFile.setVisible(true);
+                    deleteCompInfo.setVisible(true);
+                    saveTableToFile();
+                });
 
-            tableCopy.setModel(modelCopy);
-        });
-        tableCopy.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int selectedRow = tableCopy.getSelectedRow();
-                if (selectedRow >= 0) {
-                    int choice = JOptionPane.showConfirmDialog(null, "Do you want to delete this row?", "Row Selected", JOptionPane.YES_NO_OPTION);
-                    if (choice == JOptionPane.YES_OPTION) {
-                        DefaultTableModel model = (DefaultTableModel) tableCopy.getModel();
-                        model.removeRow(selectedRow);
-                        categorizedCompany.clear();
-                        loadDataFromTable(tableCopy);
-                        saveDataToFile();
-                    }
+                tableCopy.setVisible(true);
+                tableScrollPaneCopy.setVisible(true);
+
+                loadDataFromFile();
+
+                DefaultTableModel modelCopy = new DefaultTableModel();
+                modelCopy.addColumn("Industry");
+                modelCopy.addColumn("Company ID");
+                modelCopy.addColumn("Company Name");
+                modelCopy.addColumn("Designation");
+                modelCopy.addColumn("Employee Count");
+                modelCopy.addColumn("Income");
+
+                for (Company obj : arrayListFromFile) {
+                    modelCopy.addRow(new String[]{obj.getIndustry(), String.valueOf(obj.getCompanyIds()), obj.getCompanyNames(),
+                            obj.getDesignations(), String.valueOf(obj.getHowManyEmployee()), String.valueOf(obj.getIncome())});
                 }
-            }
-        });
+
+
+                tableCopy.setModel(modelCopy);
+                tableCopy.getSelectionModel().addListSelectionListener(ex -> {
+                    int selectedRow = tableCopy.getSelectedRow();
+                    if (selectedRow >= 0) {
+                        int choice = JOptionPane.showConfirmDialog(null, "Do you want to delete this row?", "Row Selected", JOptionPane.YES_NO_OPTION);
+                        if (choice == JOptionPane.YES_OPTION) {
+                            DefaultTableModel model = (DefaultTableModel) tableCopy.getModel();
+                            model.removeRow(selectedRow);
+
+                            if (selectedRow < arrayListFromFile.size()) {
+                                arrayListFromFile.remove(selectedRow);
+                            }
+                        }
+                    }
+                });
+
+            });
 
 
 
 
         this.add(afterSignIn);
-
 
 
 
@@ -250,8 +292,8 @@ public class UserInterface extends JFrame {
 
 
 
-
     private void loadDataFromTable(JTable table) {
+        arrayListFromFile.clear();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         int rowCount = model.getRowCount();
 
@@ -265,13 +307,13 @@ public class UserInterface extends JFrame {
 
             Company obj = new Company(industry, companyId, companyName,designation,employeeCount,income);
 
-            categorizedCompany.add(obj);
+            arrayListFromFile.add(obj);
         }
     }
 
 
     private void loadDataFromFile() {
-        categorizedCompany.clear();
+        arrayListFromFile.clear();
         try {
             Scanner scanner = new Scanner(new File(DATA_FILE));
             while (scanner.hasNextLine()) {
@@ -286,16 +328,16 @@ public class UserInterface extends JFrame {
                     double income = Double.parseDouble(parts[5]);
                     Company obj = new Company(industryName, cmpID, cmpName,cmpDesignation,countEmp,income);
 
-                    categorizedCompany.add(obj);
+                    arrayListFromFile.add(obj);
                 }else{
                     throw new CanNotReadException();
                 }
             }
 
-        } catch (FileNotFoundException e) {
-            System.out.println("***FILE DOES NOT EXIST***");
         } catch (CanNotReadException e) {
             System.out.println((e.getMessage()));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -303,7 +345,7 @@ public class UserInterface extends JFrame {
 
     private void saveDataToFile() {
         try {
-            FileWriter writer = new FileWriter(DATA_FILE);
+            FileWriter writer = new FileWriter(DATA_FILE, true);
             for (Company obj : categorizedCompany) {
                 writer.write(obj.toString());
             }
@@ -311,6 +353,7 @@ public class UserInterface extends JFrame {
                 throw new CanNotReadException();
             }
             writer.close();
+            categorizedCompany.clear();
         } catch (IOException e) {
             System.out.println("***COULD NOT WRITE***");
         } catch (CanNotReadException e) {
@@ -320,11 +363,31 @@ public class UserInterface extends JFrame {
 
 
 
+    private void saveTableToFile(){
+        try{
+            FileWriter writer = new FileWriter(DATA_FILE);
+            if(arrayListFromFile.isEmpty()){
+                throw new CanNotReadException();
+            }
+            for(Company obj : arrayListFromFile){
+                writer.write((obj.toString()));
+            }
+            writer.close();
+        }catch (CanNotReadException ex){
+            System.out.println(ex.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     private void createAndShowTable() {
-        addCompInfo.setVisible(false);
-        showCompInfo.setVisible(false);
-        saveToFile.setVisible(false);
-        deleteCompInfo.setVisible(false);
+
+        showCompInfo.setLocation(230,515);
+        addCompInfo.setLocation(360,515);
+        saveToFile.setLocation(490,515);
+        deleteCompInfo.setLocation(620,515);
 
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Industry");
@@ -334,16 +397,16 @@ public class UserInterface extends JFrame {
         model.addColumn("Employee Count");
         model.addColumn("Income");
 
-        for (Company obj : categorizedCompany) {
+        for (Company obj : arrayListFromFile) {
             model.addRow(new String[]{obj.getIndustry(), String.valueOf(obj.getCompanyIds()), obj.getCompanyNames(),
                     obj.getDesignations(), String.valueOf(obj.getHowManyEmployee()), String.valueOf(obj.getIncome())});
         }
 
         table = new JTable(model);
         tableScrollPane = new JScrollPane(table);
-        tableScrollPane.setPreferredSize(new Dimension(984,561));
+        tableScrollPane.setPreferredSize(new Dimension(984,500));
 
-        tableScrollPane.setBounds(0, 0, 984,561);
+        tableScrollPane.setBounds(0, 0, 984,500);
         afterSignIn.add(tableScrollPane);
 
         afterSignIn.revalidate();
@@ -351,5 +414,4 @@ public class UserInterface extends JFrame {
         afterSignIn.setVisible(true);
 
     }
-
 }
