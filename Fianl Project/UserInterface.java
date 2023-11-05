@@ -12,7 +12,7 @@ public class UserInterface extends JFrame {
 
     ArrayList<Company> categorizedCompany, arrayListFromFile;
     static final String DATA_FILE = "data.txt";
-    JButton signIn, addCompInfo, showCompInfo, saveToFile, deleteCompInfo, editCompInfo, backDelete;
+    JButton signIn, addCompInfo, showCompInfo, saveToFile, deleteCompInfo, editCompInfo, backDelete, backEdit;
     JTextField username;
     JPanel introMain, introLogIn, afterSignIn;
     static boolean showButtonClicked = false, deleteButtonClicked = false, editButtonClicked = false;
@@ -109,7 +109,7 @@ public class UserInterface extends JFrame {
         editCompInfo.setBackground(Color.WHITE);
         editCompInfo.setFocusable(false);
 
-                    // Back-Button
+                    // BackDelete-Button
         backDelete = new JButton();
         backDelete.setText("BACK");
         backDelete.setSize(120,35);
@@ -118,6 +118,14 @@ public class UserInterface extends JFrame {
         backDelete.setFocusable(false);
         backDelete.setVisible(false);
 
+                    // BackEdit-Button
+        backEdit = new JButton();
+        backEdit.setText("BACK");
+        backEdit.setSize(120,35);
+        backEdit.setFont(new Font("Arial", Font.BOLD, 13));
+        backEdit.setBackground((Color.WHITE));
+        backEdit.setFocusable(false);
+        backEdit.setVisible(false);
 
 
 
@@ -149,15 +157,12 @@ public class UserInterface extends JFrame {
         introLogIn.add(signIn); // signInButton
             signIn.setLocation(195, 290);
             signIn.addActionListener(e -> {
-                /*String s = username.getText();
-                if(Objects.equals(s, "CE0")){
+                String s = username.getText();
+                if(Objects.equals(s, "b0ss")){
                     introMain.setVisible(false);
                     introLogIn.setVisible(false);
                     afterSignIn.setVisible(true);
-                }*/
-                introMain.setVisible(false);
-                introLogIn.setVisible(false);
-                afterSignIn.setVisible(true);
+                }
             });
             introLogIn.add(username);
             username.setLocation(75, 250);
@@ -237,7 +242,6 @@ public class UserInterface extends JFrame {
 
                 if(!showButtonClicked){
                     createAndShowTable();
-                    table.setVisible(true);
                     tableScrollPane.setVisible(true);
                 }
 
@@ -281,7 +285,9 @@ public class UserInterface extends JFrame {
                 }
             });
 
-            //Back Button
+
+
+            //BackDelete Button
             backDelete.addActionListener(ex -> {
                 showCompInfo.setLocation(200,515);
                 addCompInfo.setLocation(330,515);
@@ -297,7 +303,7 @@ public class UserInterface extends JFrame {
                 editCompInfo.setVisible(true);
 
                 deleteButtonClicked = false;
-                editButtonClicked = false;
+
             });
 
 
@@ -307,15 +313,49 @@ public class UserInterface extends JFrame {
             editCompInfo.setLocation(430,350);
             afterSignIn.add(tableScrollPane);
             editCompInfo.addActionListener(e -> {
+                saveToFile.setVisible(false);
+                showCompInfo.setVisible(false);
+                addCompInfo.setVisible(false);
+                deleteCompInfo.setVisible(false);
+                editCompInfo.setVisible(false);
+
+                afterSignIn.add(tableScrollPane);
+
+                afterSignIn.add(backEdit);
+                backEdit.setVisible(true);
+                backEdit.setLocation(430,515);
+
                 loadDataFromFile();
 
                 if(!showButtonClicked){
                     createAndShowTable();
-//                    table.setVisible(true);
                     tableScrollPane.setVisible(true);
                 }
-                editButtonClicked = true;
 
+                afterSignIn.revalidate();
+                afterSignIn.repaint();
+
+                editButtonClicked = true;
+            });
+
+
+
+            //BackEdit Button
+            backEdit.addActionListener(ex -> {
+                showCompInfo.setLocation(200,515);
+                addCompInfo.setLocation(330,515);
+                saveToFile.setLocation(460,515);
+                deleteCompInfo.setLocation(590,515);
+                editCompInfo.setLocation(720,515);
+
+                backEdit.setVisible(false);
+                showCompInfo.setVisible(true);
+                addCompInfo.setVisible(true);
+                saveToFile.setVisible(true);
+                deleteCompInfo.setVisible(true);
+                editCompInfo.setVisible(true);
+
+                editButtonClicked = false;
             });
 
 
@@ -363,7 +403,7 @@ public class UserInterface extends JFrame {
             Scanner scanner = new Scanner(new File(DATA_FILE));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                String[] parts = line.split(" ");
+                String[] parts = line.split("\t");
                 if (parts.length == 6) {
                     String industryName = parts[0];
                     int cmpID = Integer.parseInt(parts[1]);
