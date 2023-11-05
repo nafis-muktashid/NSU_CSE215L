@@ -66,7 +66,7 @@ public class Company{
 
     @Override
     public String toString() {
-            return industry + " " + companyIds + " " + companyNames + " "
-                    + designations + " " + howManyEmployee + " " + income + "\n" ;
+            return industry + "\t" + companyIds + "\t" + companyNames + "\t"
+                    + designations + "\t" + howManyEmployee + "\t" + income + "\n" ;
     }
 }
