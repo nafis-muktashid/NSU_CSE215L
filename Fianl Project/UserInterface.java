@@ -12,12 +12,14 @@ public class UserInterface extends JFrame {
 
     ArrayList<Company> categorizedCompany, arrayListFromFile;
     static final String DATA_FILE = "data.txt";
-    JButton signIn, addCompInfo, showCompInfo, saveToFile, deleteCompInfo, editCompInfo, back;
+    JButton signIn, addCompInfo, showCompInfo, saveToFile, deleteCompInfo, editCompInfo, backDelete;
     JTextField username;
     JPanel introMain, introLogIn, afterSignIn;
-    JComboBox<Company> infoFields;
-    JTable table, tableCopy;
-    JScrollPane tableScrollPane, tableScrollPaneCopy;
+    static boolean showButtonClicked = false, deleteButtonClicked = false, editButtonClicked = false;
+    static boolean b = true ;
+    JTable table;
+    JScrollPane tableScrollPane;
+    static DefaultTableModel model;
 
 
 
@@ -48,11 +50,13 @@ public class UserInterface extends JFrame {
 
 
 
-        //---------------------- Combobox ---------------------------
-        infoFields = new JComboBox<>();
-        infoFields.setBackground(Color.WHITE);
-        infoFields.setSize( 320,35);
-        infoFields.setFont(new Font("Arial", Font.BOLD, 11));
+        //---------------------- Table ---------------------------
+        model = new DefaultTableModel(new Object[]{"Industry", "Company ID", "Company Name", "Designation", "Employee Count", "Income"}, 0);
+        table = new JTable(model);
+        tableScrollPane = new JScrollPane(table);
+        tableScrollPane.setPreferredSize(new Dimension(984, 500));
+        tableScrollPane.setBounds(0, 0, 984, 500);
+        tableScrollPane.setVisible(false);
 
 
 
@@ -106,13 +110,13 @@ public class UserInterface extends JFrame {
         editCompInfo.setFocusable(false);
 
                     // Back-Button
-        back = new JButton();
-        back.setText("BACK");
-        back.setSize(120,35);
-        back.setFont(new Font("Arial", Font.BOLD, 13));
-        back.setBackground((Color.WHITE));
-        back.setFocusable(false);
-        back.setVisible(false);
+        backDelete = new JButton();
+        backDelete.setText("BACK");
+        backDelete.setSize(120,35);
+        backDelete.setFont(new Font("Arial", Font.BOLD, 13));
+        backDelete.setBackground((Color.WHITE));
+        backDelete.setFocusable(false);
+        backDelete.setVisible(false);
 
 
 
@@ -191,7 +195,10 @@ public class UserInterface extends JFrame {
             //Save Button
             afterSignIn.add(saveToFile);
             saveToFile.setLocation(430, 220);
-            saveToFile.addActionListener(e -> saveDataToFile());
+            saveToFile.addActionListener(e ->{
+                saveDataToFile();
+                showButtonClicked = false;
+            });
 
 
 
@@ -200,7 +207,10 @@ public class UserInterface extends JFrame {
             showCompInfo.setLocation(430,310);
             showCompInfo.addActionListener(e -> {
                 loadDataFromFile();
-                createAndShowTable();
+                if(!showButtonClicked){
+                    createAndShowTable();
+                    showButtonClicked = true;
+                }
             });
 
 
@@ -208,71 +218,109 @@ public class UserInterface extends JFrame {
             //Delete Button
             afterSignIn.add(deleteCompInfo);
             deleteCompInfo.setLocation(430, 265);
-            tableCopy = new JTable();
-            tableScrollPaneCopy = new JScrollPane(tableCopy);
-            tableScrollPaneCopy.setPreferredSize(new Dimension(984, 500));
-            tableScrollPaneCopy.setBounds(0, 0, 984, 500);
-            tableCopy.setVisible(false);
-            tableScrollPaneCopy.setVisible(false);
-            afterSignIn.add(tableScrollPaneCopy);
+
             deleteCompInfo.addActionListener(e -> {
 
-                saveToFile.setLocation(490,515);
+                saveToFile.setVisible(false);
                 showCompInfo.setVisible(false);
                 addCompInfo.setVisible(false);
                 deleteCompInfo.setVisible(false);
+                editCompInfo.setVisible(false);
 
-                afterSignIn.add(back);
-                back.setVisible(true);
-                back.setLocation(350,515);
-                back.addActionListener(ex -> {
-                    tableCopy.setVisible(false);
-                    tableScrollPaneCopy.setVisible(false);
-                    back.setVisible(false);
-                    showCompInfo.setVisible(true);
-                    addCompInfo.setVisible(true);
-                    saveToFile.setVisible(true);
-                    deleteCompInfo.setVisible(true);
-                    saveTableToFile();
-                });
+                afterSignIn.add(tableScrollPane);
 
-                tableCopy.setVisible(true);
-                tableScrollPaneCopy.setVisible(true);
+                afterSignIn.add(backDelete);
+                backDelete.setVisible(true);
+                backDelete.setLocation(430,515);
 
                 loadDataFromFile();
 
-                DefaultTableModel modelCopy = new DefaultTableModel();
-                modelCopy.addColumn("Industry");
-                modelCopy.addColumn("Company ID");
-                modelCopy.addColumn("Company Name");
-                modelCopy.addColumn("Designation");
-                modelCopy.addColumn("Employee Count");
-                modelCopy.addColumn("Income");
-
-                for (Company obj : arrayListFromFile) {
-                    modelCopy.addRow(new String[]{obj.getIndustry(), String.valueOf(obj.getCompanyIds()), obj.getCompanyNames(),
-                            obj.getDesignations(), String.valueOf(obj.getHowManyEmployee()), String.valueOf(obj.getIncome())});
+                if(!showButtonClicked){
+                    createAndShowTable();
+                    table.setVisible(true);
+                    tableScrollPane.setVisible(true);
                 }
 
+                afterSignIn.revalidate();
+                afterSignIn.repaint();
 
-                tableCopy.setModel(modelCopy);
-                tableCopy.getSelectionModel().addListSelectionListener(ex -> {
-                    int selectedRow = tableCopy.getSelectedRow();
+                deleteButtonClicked = true;
+
+            });
+            table.getSelectionModel().addListSelectionListener(ex -> {
+                if(deleteButtonClicked){
+                    int selectedRow = table.getSelectedRow();
                     if (selectedRow >= 0) {
                         int choice = JOptionPane.showConfirmDialog(null, "Do you want to delete this row?", "Row Selected", JOptionPane.YES_NO_OPTION);
                         if (choice == JOptionPane.YES_OPTION) {
-                            DefaultTableModel model = (DefaultTableModel) tableCopy.getModel();
                             model.removeRow(selectedRow);
-
-                            if (selectedRow < arrayListFromFile.size()) {
-                                arrayListFromFile.remove(selectedRow);
-                            }
+                            loadDataFromTable(table);
                         }
                     }
-                });
+                }else if(editButtonClicked){
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow >= 0) {
+                        String industry = (String) model.getValueAt(selectedRow, 0);
+                        int companyId = (int) model.getValueAt(selectedRow, 1);
+                        String companyName = (String) model.getValueAt(selectedRow, 2);
+                        String designation = (String) model.getValueAt(selectedRow, 3);
+                        int currentEmployeeCount = (int) model.getValueAt(selectedRow, 4);
 
+                        // Create an input dialog for editing the "How many employee" field
+                        String input = JOptionPane.showInputDialog(this, "Edit How many employee for " + companyName, currentEmployeeCount);
+
+                        try {
+                            int newEmployeeCount = Integer.parseInt(input);
+
+                            // Update the table model with the new value
+                            model.setValueAt(newEmployeeCount, selectedRow, 4);
+
+                            loadDataFromTable(table);
+                            saveTableToFile();
+
+                        } catch (NumberFormatException exc) {
+                            System.out.println("***INVALID FORMAT***");
+                        }
+                    }
+                }
             });
 
+            //Back Button
+            backDelete.addActionListener(ex -> {
+                showCompInfo.setLocation(200,515);
+                addCompInfo.setLocation(330,515);
+                saveToFile.setLocation(460,515);
+                deleteCompInfo.setLocation(590,515);
+                editCompInfo.setLocation(720,515);
+
+                backDelete.setVisible(false);
+                showCompInfo.setVisible(true);
+                addCompInfo.setVisible(true);
+                saveToFile.setVisible(true);
+                deleteCompInfo.setVisible(true);
+                editCompInfo.setVisible(true);
+
+                deleteButtonClicked = false;
+                editButtonClicked = false;
+            });
+
+
+
+            //Edit Button
+            afterSignIn.add(editCompInfo);
+            editCompInfo.setLocation(430,350);
+            afterSignIn.add(tableScrollPane);
+            editCompInfo.addActionListener(e -> {
+                loadDataFromFile();
+
+                if(!showButtonClicked){
+                    createAndShowTable();
+//                    table.setVisible(true);
+                    tableScrollPane.setVisible(true);
+                }
+                editButtonClicked = true;
+
+            });
 
 
 
@@ -299,21 +347,22 @@ public class UserInterface extends JFrame {
 
         for (int row = 0; row < rowCount; row++) {
             String industry = (String) model.getValueAt(row, 0);
-            int companyId = (int) model.getValueAt(row, 1);
+            int companyId = (Integer.parseInt(model.getValueAt(row, 1).toString())) ;
             String companyName = (String) model.getValueAt(row, 2);
             String designation = (String) model.getValueAt(row, 3);
-            int employeeCount = (int) model.getValueAt(row, 4);
-            double income = (double) model.getValueAt(row, 5);
+            int employeeCount = (Integer.parseInt(model.getValueAt(row, 4).toString()));
+            double income = (Double.parseDouble(model.getValueAt(row, 5).toString()));
 
             Company obj = new Company(industry, companyId, companyName,designation,employeeCount,income);
 
             arrayListFromFile.add(obj);
         }
+        saveTableToFile();
     }
 
 
     private void loadDataFromFile() {
-        arrayListFromFile.clear();
+        arrayListFromFile = new ArrayList<>();
         try {
             Scanner scanner = new Scanner(new File(DATA_FILE));
             while (scanner.hasNextLine()) {
@@ -326,6 +375,7 @@ public class UserInterface extends JFrame {
                     String cmpDesignation = parts[3];
                     int countEmp = Integer.parseInt(parts[4]);
                     double income = Double.parseDouble(parts[5]);
+
                     Company obj = new Company(industryName, cmpID, cmpName,cmpDesignation,countEmp,income);
 
                     arrayListFromFile.add(obj);
@@ -384,29 +434,38 @@ public class UserInterface extends JFrame {
 
     private void createAndShowTable() {
 
-        showCompInfo.setLocation(230,515);
-        addCompInfo.setLocation(360,515);
-        saveToFile.setLocation(490,515);
-        deleteCompInfo.setLocation(620,515);
+        showCompInfo.setLocation(200,515);
+        addCompInfo.setLocation(330,515);
+        saveToFile.setLocation(460,515);
+        deleteCompInfo.setLocation(590,515);
+        editCompInfo.setLocation(720,515);
 
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Industry");
-        model.addColumn("Company ID");
-        model.addColumn("Company Name");
-        model.addColumn("Designation");
-        model.addColumn("Employee Count");
-        model.addColumn("Income");
 
-        for (Company obj : arrayListFromFile) {
-            model.addRow(new String[]{obj.getIndustry(), String.valueOf(obj.getCompanyIds()), obj.getCompanyNames(),
-                    obj.getDesignations(), String.valueOf(obj.getHowManyEmployee()), String.valueOf(obj.getIncome())});
+        if(!b) {
+            int i ;
+            for(i=0; i<arrayListFromFile.size()-1; ++i){
+                model.setValueAt((arrayListFromFile.get(i)).getIndustry(), i, 0);
+                model.setValueAt((arrayListFromFile.get(i)).getCompanyIds()+"", i, 1);
+                model.setValueAt((arrayListFromFile.get(i)).getCompanyNames(), i, 2);
+                model.setValueAt((arrayListFromFile.get(i)).getDesignations(), i, 3);
+                model.setValueAt((arrayListFromFile.get(i)).getHowManyEmployee()+"", i, 4);
+                model.setValueAt((arrayListFromFile.get(i)).getIncome()+"", i, 5);
+
+            }
+            model.addRow(new Object[] {arrayListFromFile.get(i).getIndustry(),arrayListFromFile.get(i).getCompanyIds(),arrayListFromFile.get(i).getCompanyNames(),
+                    arrayListFromFile.get(i).getDesignations(),arrayListFromFile.get(i).getHowManyEmployee(),arrayListFromFile.get(i).getIncome()});
+
+        }
+        if(b) {
+            b= false ;
+
+            for (Company obj : arrayListFromFile) {
+                model.addRow(new String[]{obj.getIndustry(), String.valueOf(obj.getCompanyIds()), obj.getCompanyNames(),
+                        obj.getDesignations(), String.valueOf(obj.getHowManyEmployee()), String.valueOf(obj.getIncome())});
+            }
         }
 
-        table = new JTable(model);
-        tableScrollPane = new JScrollPane(table);
-        tableScrollPane.setPreferredSize(new Dimension(984,500));
-
-        tableScrollPane.setBounds(0, 0, 984,500);
+        tableScrollPane.setVisible(true);
         afterSignIn.add(tableScrollPane);
 
         afterSignIn.revalidate();
