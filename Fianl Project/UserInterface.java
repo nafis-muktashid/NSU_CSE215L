@@ -260,23 +260,19 @@ public class UserInterface extends JFrame {
                 }else if(editButtonClicked){
                     int selectedRow = table.getSelectedRow();
                     if (selectedRow >= 0) {
-                        String industry = (String) model.getValueAt(selectedRow, 0);
-                        int companyId = (int) model.getValueAt(selectedRow, 1);
                         String companyName = (String) model.getValueAt(selectedRow, 2);
-                        String designation = (String) model.getValueAt(selectedRow, 3);
-                        int currentEmployeeCount = (int) model.getValueAt(selectedRow, 4);
+                        int currentEmployeeCount = (Integer.parseInt(model.getValueAt(selectedRow, 4).toString()));
+                        double currentIncome = (Double.parseDouble(model.getValueAt(selectedRow, 5).toString()));
+                        double temp = currentIncome / currentEmployeeCount;
 
-                        // Create an input dialog for editing the "How many employee" field
                         String input = JOptionPane.showInputDialog(this, "Edit How many employee for " + companyName, currentEmployeeCount);
 
                         try {
                             int newEmployeeCount = Integer.parseInt(input);
-
-                            // Update the table model with the new value
                             model.setValueAt(newEmployeeCount, selectedRow, 4);
+                            model.setValueAt(newEmployeeCount * temp, selectedRow, 5);
 
                             loadDataFromTable(table);
-                            saveTableToFile();
 
                         } catch (NumberFormatException exc) {
                             System.out.println("***INVALID FORMAT***");
